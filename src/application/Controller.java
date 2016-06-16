@@ -1,5 +1,6 @@
 package application;
 
+import java.io.File;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -10,6 +11,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
 
 public class Controller implements Initializable {
 	
@@ -21,15 +23,20 @@ public class Controller implements Initializable {
 	private TextField URLField;
 	@FXML
 	private TextField directoryField;
-	
-	String url;
+	private String url;
+	private String directory = null;
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
 		saveButton.setOnAction(new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent event)
 			{
 				try {
-					url = URLField.getText();
+					if(directory != null) {
+						url = URLField.getText();
+						ThreadToPNG ttpng = new ThreadToPNG(url,directory);
+						directory = null;
+						url = "";
+					}
 				} catch(Exception e) {
 					e.printStackTrace();
 				}
@@ -42,7 +49,12 @@ public class Controller implements Initializable {
 				try {
 					FileChooser fileChooser = new FileChooser();
 					fileChooser.setTitle("Set Save Directory");
-					fileChooser.showSaveDialog(null);
+					fileChooser.getExtensionFilters().addAll(
+			                new FileChooser.ExtensionFilter("PNG", "*.png")
+			            );
+					directory = fileChooser.showSaveDialog(null).getAbsolutePath();
+					directoryField.setText(directory);
+				
 				} catch(Exception e) {
 					e.printStackTrace();
 				}
